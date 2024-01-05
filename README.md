@@ -1,5 +1,8 @@
 # Drugs Classification Using Machine Learning Algorithms
 
+![Screenshot 2024-01-05 164815](https://github.com/badarunnisats/Drugs-Classification-Using-Machine-Learning-Algorithms/assets/109198401/3baa5caa-faa0-4c02-aa3f-7c809df840d4)
+
+
 This Github aims to predict insurance charges based on various factors using machine learning models.Build different classification models from historical data of patients and their responses to different medications. Then you use the trained algorithms to predict the class of an unknown patient or to find a proper drug for a new patient.
 
 # Overview
