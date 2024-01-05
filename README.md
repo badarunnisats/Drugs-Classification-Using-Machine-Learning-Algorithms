@@ -15,8 +15,8 @@ This project aims to predict insurance charges based on various factors using ma
 
 ```python
 #Downloading the data from the provided URL and reading it into a DataFrame
-!wget https://raw.githubusercontent.com/alexjolly28/entri_DSML/main/resources/insurance.csv
-df = pd.read_csv("insurance.csv")
+!wget -O drug200.csv https://s3-api.us-geo.objectstorage.softlayer.net/cf-courses-data/CognitiveClass/ML0101ENv3/labs/drug200.csv
+df = pd.read_csv("drug200.csv")
 ```
 
 **2. Exploratory Data Analysis (EDA):**
@@ -29,6 +29,9 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
+import os
+import warnings
+warnings.filterwarnings("ignore")
 
 #Descriptive stats
 df.describe()
@@ -36,64 +39,102 @@ df.describe()
 #Null check
 df.isnull().value_counts()
 
-#Age vs Charges visualization
-sns.lmplot(x='age', y='charges', data=df, scatter_kws={'alpha': 0.3}, line_kws={'color': 'red'})
-plt.title('Age vs Insurance Charges')
-plt.xlabel('Age')
-plt.ylabel('Insurance Charges')
+#Blood pressure of patients
+
+sns.set_theme(style="darkgrid")
+sns.countplot(y="BP", data=df, palette="crest")
+plt.ylabel('Blood Pressure')
+plt.xlabel('Total')
 plt.show()
+
+
 ```
 
 **3. Data Preprocessing:**
 
-- Label encoding is applied to categorical variables (e.g., sex, smoker, region) to convert them into numerical format. from sklearn.preprocessing import LabelEncoder
+- Label encoding is applied to categorical variables (e.g., Drug,Cholestrol,BP,Sex) to convert them into numerical format. from sklearn.preprocessing import LabelEncoder
 
 ```python
-label_encoder = LabelEncoder()
-df['sex_encoded'] = label_encoder.fit_transform(df['sex'])
-df['smoker_encoded'] = label_encoder.fit_transform(df['smoker'])
-df['region_encoded'] = label_encoder.fit_transform(df['region'])
-Unnecessary columns are removed.
-unnecessary_columns = ['sex', 'smoker', 'region']
-df = df.drop(columns=unnecessary_columns)
+enc = LabelEncoder()
+cdf = df
+cdf['Drug'] = enc.fit_transform(df['Drug'])
+cdf['Cholesterol'] = enc.fit_transform(df['Cholesterol'])
+cdf['BP'] = enc.fit_transform(df['BP'])
+cdf['Sex'] = enc.fit_transform(df['Sex'])
 ```
 **4. Feature Selection:**
 
 - Independent (features) and dependent (target) variables are selected.
 
 ```python
-X = df[['age', 'sex_encoded', 'bmi', 'children', 'smoker_encoded', 'region_encoded']]
-y = df['charges']
+X = cdf[['Age', 'Sex', 'BP', 'Cholesterol', 'Na_to_K']]
+y = cdf['Drug']
 ```
 
 **5. Modeling:**
 
-- Various regression models are explored, including Linear Regression, Decision Tree, Random Forest, and Support Vector Machine (SVR).
+- Various regression models are explored, including Logistic Regression, Decision Tree, Random Forest, and Support Vector Machine (SVR),Naive Bayes,KNN.
 
 ```python
 from sklearn.model_selection import train_test_split
-from sklearn.linear_model import LinearRegression
-from sklearn.tree import DecisionTreeRegressor
-from sklearn.ensemble import RandomForestRegressor
-from sklearn.svm import SVR
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.svm import SVC
+from sklearn.naive_bayes import GaussianNB
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import accuracy_score
 
-#Splitting the data
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+X_train_encoded = pd.get_dummies(X_train)
+X_test_encoded = pd.get_dummies(X_test)
 
-#Initializing models
-models = [
-    ('Linear Regression', LinearRegression()),
-    ('Decision Tree', DecisionTreeRegressor(random_state=42)),
-    ('Random Forest', RandomForestRegressor(n_estimators=100, random_state=42)),
-    ('Support Vector Machine', SVR(kernel='linear'))
-]
+missing_cols = set(X_train_encoded.columns) - set(X_test_encoded.columns)
+for col in missing_cols:
+    X_test_encoded[col] = 0
 
-#Evaluating models
-for model_name, model in models:
-    cv_scores = cross_val_score(model, X, y, cv=5, scoring='neg_mean_squared_error')
-    avg_mse = -cv_scores.mean()
-    print(f"{model_name} - Average MSE: {avg_mse}")
+rf_classifier = RandomForestClassifier()
+svm_classifier = SVC()
+nb_classifier = GaussianNB()
+knn_classifier = KNeighborsClassifier()
+dt_classifier = DecisionTreeClassifier()
+lr_classifier = LogisticRegression()
+
+rf_classifier.fit(X_train_encoded, y_train)
+svm_classifier.fit(X_train_encoded, y_train)
+nb_classifier.fit(X_train_encoded, y_train)
+knn_classifier.fit(X_train_encoded, y_train)
+dt_classifier.fit(X_train_encoded, y_train)
+lr_classifier.fit(X_train_encoded, y_train)
+
+rf_predictions = rf_classifier.predict(X_test_encoded)
+svm_predictions = svm_classifier.predict(X_test_encoded)
+nb_predictions = nb_classifier.predict(X_test_encoded)
+knn_predictions = knn_classifier.predict(X_test_encoded)
+dt_predictions = dt_classifier.predict(X_test_encoded)
+lr_predictions = lr_classifier.predict(X_test_encoded)
+
+rf_accuracy = accuracy_score(y_test, rf_predictions)
+svm_accuracy = accuracy_score(y_test, svm_predictions)
+nb_accuracy = accuracy_score(y_test, nb_predictions)
+knn_accuracy = accuracy_score(y_test, knn_predictions)
+dt_accuracy = accuracy_score(y_test, dt_predictions)
+lr_accuracy = accuracy_score(y_test, lr_predictions)
+
+print("Random Forest Accuracy:", rf_accuracy)
+print("SVM Accuracy:", svm_accuracy)
+print("Naive Bayes Accuracy:", nb_accuracy)
+print("KNN Accuracy:", knn_accuracy)
+print("Decision Tree Accuracy:", dt_accuracy)
+print("Logistic Regression Accuracy:", lr_accuracy)
+
 ```
 6. Conclusion:
 
 The model with the lowest average Mean Squared Error (MSE) can be considered the best model for predicting insurance charges.
+```python
+best_model = compare.sort_values(by='Accuracy', ascending=False).iloc[0]
+print("Best Model:", best_model['Model'])
+print("Accuracy:", best_model['Accuracy'])
+
+```
