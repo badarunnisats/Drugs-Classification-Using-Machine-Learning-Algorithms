@@ -76,7 +76,7 @@ y = cdf['Drug']
 
 **5. Modeling:**
 
-- Various regression models are explored, including Logistic Regression, Decision Tree, Random Forest, and Support Vector Machine (SVR),Naive Bayes,KNN.
+- Various classification models are explored, including Logistic Regression, Decision Tree, Random Forest, and Support Vector Machine (SVR),Naive Bayes,KNN.
 
 ```python
 from sklearn.model_selection import train_test_split
