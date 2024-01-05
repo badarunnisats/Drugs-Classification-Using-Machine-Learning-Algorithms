@@ -134,7 +134,7 @@ print("Logistic Regression Accuracy:", lr_accuracy)
 ```
 6. Conclusion:
 
-The model with the lowest average Mean Squared Error (MSE) can be considered the best model for predicting insurance charges.
+The model with the highest accuracy rate can be considered the best model for classifying the for the future patients having hte same illness in future.
 ```python
 best_model = compare.sort_values(by='Accuracy', ascending=False).iloc[0]
 print("Best Model:", best_model['Model'])
