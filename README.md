@@ -132,7 +132,7 @@ print("Decision Tree Accuracy:", dt_accuracy)
 print("Logistic Regression Accuracy:", lr_accuracy)
 
 ```
-6. Conclusion:
+# Conclusion:
 
 The model with the highest accuracy rate can be considered the best model for classifying the for the future patients having hte same illness in future.
 ```python
